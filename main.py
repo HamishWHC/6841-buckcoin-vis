@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 COMMENT_CLASS = "css-4zwhzf-CommentCard"
 
 BLOCK_REGEX = re.compile(
-    r"(?P<block>(?P<chain_length>[0-9]+)\+(?P<prediction>[a-zA-Z0-9 ]+)\+.*(?P<prev_hash>[0-9a-fA-F]{64})\+(?P<serial_number>[0-9]+))\s+.*(?P<claimed_hash>[0-9a-fA-F]{64})")
+    r"(?P<block>(?P<chain_length>[0-9]+)\+(?P<prediction>[a-zA-Z0-9 _\-]+)\+.*(?P<prev_hash>[0-9a-fA-F]{64})\+(?P<serial_number>[0-9]+)).+(?P<claimed_hash>[0-9a-fA-F]{64})", flags=re.S)
 
 
 def try_parse_int(s, base=10, val=None):
@@ -76,7 +76,7 @@ def correct_hash(block):
 
 
 def correct_length(block):
-    return block["chain_lengths"]["actual"] == block["chain_lengths"]["claimed"]
+    return block["chain_lengths"]["expected"] == block["chain_lengths"]["claimed"]
 
 
 def valid_hash(block):
@@ -99,10 +99,15 @@ def check_block_validity(blocks, block):
     prev = blocks.get(block["prev_hash"])
     if prev is None:
         block["chain_lengths"]["actual"] = 1
+        block["chain_lengths"]["expected"] = 1
         block["invalid_chain"] = False
     else:
         check_block_validity(blocks, prev)
         block["chain_lengths"]["actual"] = prev["chain_lengths"]["actual"] + 1
+        if not correct_length(prev):
+            block["chain_lengths"]["expected"] = prev["chain_lengths"]["claimed"] + 1
+        else:
+            block["chain_lengths"]["expected"] = prev["chain_lengths"]["expected"] + 1
         block["invalid_chain"] = prev["valid"] is False or prev["invalid_chain"] is True
 
     block["valid"] = correct_hash(block) and correct_length(
@@ -124,7 +129,7 @@ def block_formatter(block):
         if not valid_hash(block):
             issues += f"""Hash not starting with [0-9a-f][0-9]."""
         if not correct_length(block):
-            issues += f"""Expected length: {block["chain_lengths"]["actual"]}, claimed: {block["chain_lengths"]["claimed"]}"""
+            issues += f"""Expected length: {block["chain_lengths"]["expected"]}, claimed: {block["chain_lengths"]["claimed"]}"""
 
     return f"""{hash_digest(block["hashes"]["claimed"])}["{hash_digest(block["hashes"]["claimed"])}...
 {block["author"]}
