@@ -204,12 +204,18 @@ GENESIS_BLOCK = ("""
 083eaee1b4dc40f7ffa14d23b3ea78059b5cb3b529dc9e24f508160bcddd6e33
 """, "Richard Buckland")
 
+DELETED_BLOCK = ("""
+49+Valve Corporation+09e9d3191037561448e43d0f3d6f78806b646fccb95318b2505a69b5a1f60bd0+86
+03c6c767415ebe1edb6b9f6efb198f8e1e71bbaec0144dad2b8b5a9462e89b78
+""", "Korn")
+
 
 if __name__ == "__main__":
     with open("in.html") as f:
         blocks = read_blocks(f.read())
 
-    blocks = blocks | parse_blocks(*GENESIS_BLOCK)
+    blocks = blocks | parse_blocks(
+        *GENESIS_BLOCK) | parse_blocks(*DELETED_BLOCK)
 
     blocks = check_chain_validity(blocks)
 
