@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 COMMENT_CLASS = "css-4zwhzf-CommentCard"
 
 BLOCK_REGEX = re.compile(
-    r"(?P<block>(?P<chain_length>[0-9]+)\+(?P<prediction>[a-zA-Z0-9 _\-]+)\+.*(?P<prev_hash>[0-9a-fA-F]{64})\+(?P<serial_number>[0-9]+)).+(?P<claimed_hash>[0-9a-fA-F]{64})", flags=re.S)
+    r"(?P<block>(?P<chain_length>[0-9]+)\+(?P<prediction>[a-zA-Z0-9 _\-\.]+)\+.*(?P<prev_hash>[0-9a-fA-F]{64})\+(?P<serial_number>[0-9]+)).+(?P<claimed_hash>[0-9a-fA-F]{64})", flags=re.S)
 
 
 def try_parse_int(s, base=10, val=None):
