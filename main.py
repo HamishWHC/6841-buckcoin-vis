@@ -199,23 +199,48 @@ flowchart TB
 ```"""
 
 
-GENESIS_BLOCK = ("""
+BLOCKS_TO_INSERT = [
+    ("""
 1+Service NSW+0f603b5f322a16568bf7b0acff51008466408cdccbfeff675118bbde8ca49b50+11
 083eaee1b4dc40f7ffa14d23b3ea78059b5cb3b529dc9e24f508160bcddd6e33
-""", "Richard Buckland")
-
-DELETED_BLOCK = ("""
+""", "Richard Buckland"),
+    ("""
 49+Valve Corporation+09e9d3191037561448e43d0f3d6f78806b646fccb95318b2505a69b5a1f60bd0+86
 03c6c767415ebe1edb6b9f6efb198f8e1e71bbaec0144dad2b8b5a9462e89b78
-""", "Korn")
+""", "Korn"),
+    ("""
+103+Apple+01a278436dcb31a41945f484ae49fc9bb967ddb8f62379bdeddf38a36ae92353+61
+087f5faa8ebe34762fdaae1e816d2b6bf4515e9c8a89eb56fab3683802f453d0
+""", "Derek"),
+    ("""
+101+sleep+049bc085815d43d5960b0eb5a519bb0be1679f03ef815a3b9514f95697bbb3e9+13
+095804d8ffe6e1e08354b6f29c2e1baf3487d53d466f0c4ecd06ec3aa51ea693
+""", "Anahed"),
+    ("""
+100+Scomo+049bc085815d43d5960b0eb5a519bb0be1679f03ef815a3b9514f95697bbb3e9+8
+08a9782b0680c7d37f27d64a8b17b01deb3dfb6bccdf3712292da7ffaf664a15
+""", "Kelvin"),
+    ("""
+94+Sydney+07302bb69415abf63e0cbe7bc596be313cab8cfa3fdeb903def19b2fbebedaef+92
+008dbcb12e520b2bdfef787d9d0394456042601e36e0d239e4dc09714b9ab736
+""", "Yuanyuan")
+]
+
+EXCLUDED_BLOCKS = [
+    "b62a3a072a6187d9a9df39dafa97de99154835d2531320f73e685173a8c7e78f",
+    "00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048"
+]
 
 
 if __name__ == "__main__":
     with open("in.html") as f:
         blocks = read_blocks(f.read())
 
-    blocks = blocks | parse_blocks(
-        *GENESIS_BLOCK) | parse_blocks(*DELETED_BLOCK)
+    for block in BLOCKS_TO_INSERT:
+        blocks = blocks | parse_blocks(*block)
+
+    for block in EXCLUDED_BLOCKS:
+        del blocks[block]
 
     blocks = check_chain_validity(blocks)
 
